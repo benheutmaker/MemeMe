@@ -71,7 +71,7 @@ class MemeCollectionViewController: UICollectionViewController, UICollectionView
     
         let meme = self.memes[indexPath.row]
         
-        cell.cellImageView?.image = meme.image
+        cell.cellImageView?.image = meme.memedImage
         cell.topTextLabel?.text = meme.topText
         cell.bottomTextLabel?.text = meme.bottomText
     
@@ -87,6 +87,7 @@ class MemeCollectionViewController: UICollectionViewController, UICollectionView
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        
         return CGSize(width: self.view.frame.width / 3 - 8, height: self.view.frame.width / 3 - 8)
     }
 

@@ -10,7 +10,9 @@ import UIKit
 
 class MemeTableViewController: UITableViewController {
     
-    var memes: [Meme]!
+    var memes: [Meme]?
+    
+    let applicationDelegate = (UIApplication.sharedApplication().delegate as! AppDelegate)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,12 +20,14 @@ class MemeTableViewController: UITableViewController {
         //Add a '+' button to rightBarButtonItem
         let newMemeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "newMeme")
         self.navigationItem.rightBarButtonItem = newMemeButton
+        
+        //Add an 'Edit' Button to leftBarButtonItem
+        self.navigationItem.leftBarButtonItem = self.editButtonItem()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
         
-        let applicationDelegate = (UIApplication.sharedApplication().delegate as! AppDelegate)
         self.memes = applicationDelegate.memes
         
         self.tableView.reloadData()
@@ -32,8 +36,11 @@ class MemeTableViewController: UITableViewController {
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(true)
         
-        if memes.isEmpty {
-            newMeme()
+        if self.memes?.isEmpty == true {
+            if applicationDelegate.shouldShowNewMeme == true {
+                newMeme()
+                applicationDelegate.shouldShowNewMeme = false
+            }
         }
     }
 
@@ -59,17 +66,17 @@ class MemeTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.memes.count
+        return self.memes!.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 
-        let meme = self.memes[indexPath.row]
+        let meme = self.memes?[indexPath.row]
         
-        cell.imageView?.image = meme.image
-        cell.textLabel?.text = meme.topText
-        cell.detailTextLabel?.text = meme.bottomText
+        cell.imageView?.image = meme?.memedImage
+        cell.textLabel?.text = meme?.topText
+        cell.detailTextLabel?.text = meme?.bottomText
 
         return cell
     }
@@ -85,49 +92,20 @@ class MemeTableViewController: UITableViewController {
     }
     
 
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
-    */
 
-    /*
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
+            self.memes?.removeAtIndex(indexPath.row)
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            
+            tableView.reloadData()
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

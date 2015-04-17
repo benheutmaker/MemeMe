@@ -25,6 +25,8 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     @IBOutlet var pickImageButton: UIBarButtonItem!
     @IBOutlet var takePictureButton: UIBarButtonItem!
     
+    @IBOutlet var scrollView: UIScrollView!
+    
     var meme: Meme?
     
     //MARK: - View lifecycle methods
@@ -47,13 +49,10 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
         self.actionButton.enabled = self.imageView.image != nil
         self.saveButton.enabled = self.imageView.image != nil
         
-        
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        
-        self.subscribeToKeyboardNotifications()
         
         self.topTextField.delegate = self
         self.bottomTextField.delegate = self
@@ -70,12 +69,6 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
         
         self.topTextField.defaultTextAttributes = textAttributes
         self.bottomTextField.defaultTextAttributes = textAttributes
-    }
-    
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(true)
-        self.unsubscribeFromKeyboardNotifications()
     }
     
     
@@ -218,46 +211,54 @@ class MemeEditorViewController: UIViewController, UITextFieldDelegate, UIImagePi
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         if textField == self.topTextField {
             self.bottomTextField.becomeFirstResponder()
+            
         } else {
             textField.resignFirstResponder()
         }
         return true
     }
+    
+    func textFieldDidBeginEditing(textField: UITextField) {
+        scrollView.setContentOffset(CGPoint(x: 0, y: textField.frame.origin.y), animated: true)
+    }
 
-    
-    //MARK: - Keyboard Functions
-    
-    func keyboardWillShow(notification: NSNotification) {
-        if bottomTextField.isFirstResponder() {
-            self.view.frame.origin.y -= getKeyboardHeight(notification)
-        }
+    func textFieldDidEndEditing(textField: UITextField) {
+        scrollView.setContentOffset(CGPointZero, animated: true)
     }
     
-    func keyboardWillHide(notification: NSNotification) {
-        self.view.frame.origin.y += getKeyboardHeight(notification)
-    }
-    
-    func getKeyboardHeight(notification: NSNotification) -> CGFloat {
-        let userInfo = notification.userInfo
-        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue //of CGRect
-        return keyboardSize.CGRectValue().height
-    }
-    
-    func subscribeToKeyboardNotifications() {
-        //Keyboard will show notification subscription
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        
-        //Keyboard will hide notification subscription
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-    }
-    
-    func unsubscribeFromKeyboardNotifications() {
-        //Keyboard will show notification unsubscription
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-        
-        //Keyboard will hide notification subscription
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
-    }
+//    //MARK: - Keyboard Functions
+//    
+//    func keyboardWillShow(notification: NSNotification) {
+//        if bottomTextField.isFirstResponder() {
+//            self.view.frame.origin.y -= getKeyboardHeight(notification)
+//        }
+//    }
+//    
+//    func keyboardWillHide(notification: NSNotification) {
+//        self.view.frame.origin.y += getKeyboardHeight(notification)
+//    }
+//    
+//    func getKeyboardHeight(notification: NSNotification) -> CGFloat {
+//        let userInfo = notification.userInfo
+//        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue //of CGRect
+//        return keyboardSize.CGRectValue().height
+//    }
+//    
+//    func subscribeToKeyboardNotifications() {
+//        //Keyboard will show notification subscription
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
+//        
+//        //Keyboard will hide notification subscription
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+//    }
+//    
+//    func unsubscribeFromKeyboardNotifications() {
+//        //Keyboard will show notification unsubscription
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+//        
+//        //Keyboard will hide notification subscription
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+//    }
     
 }
 
